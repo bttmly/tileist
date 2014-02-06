@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>Tileist</title>
+        <meta name="description" content="Tileist: a jQuery plugin">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <style>
+            body {
+                font-family: sans-serif;
+                margin: 2rem;
+            }
+
+            h1 {
+                text-align: center;
+            }
+
+            .tileist-box {
+                margin: 2rem auto;
+                height: 24rem;
+                width: 100%;
+                border: 1px solid #666;
+            }
+
+
+        </style>
+    </head>
+    <body>
+        <h1>Tileist</h1>
+        <div class="tileist-box" id="js-tileist-box"></div>
+
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+        <script src="tileist.js"></script>
+        <script>
+            $(function(){
+                $("#js-tileist-box").tileist()
+            });
+
+        </script>
+    </body>
+</html>
