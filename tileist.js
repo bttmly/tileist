@@ -148,9 +148,6 @@ $.fn.tileist = function(options) {
   grid.cells = $(".tileist-cell");
   focus = grid.randomCell();
   grid.focalCell = grid.cells.eq(grid.coordToFlatIndex(focus));
-  grid.focalCell.css({
-    background: "blue"
-  });
   distances = [];
   color = Color(settings.color);
   grid.cells.each(function(i) {
@@ -176,9 +173,9 @@ $.fn.tileist = function(options) {
     }
   });
   vein.inject(".tileist-cell-triangle div:nth-of-type(2)", {
-    "-webkit-transform": "rotate(180deg) translateY(80px)",
-    "-moz-transform": "rotate(180deg) translateY(80px)",
-    "transform": "rotate(180deg) translateY(80px)"
+    "-webkit-transform": "rotate(180deg) translateY(" + settings.height + "px)",
+    "-moz-transform": "rotate(180deg) translateY(" + settings.height + "px)",
+    "transform": "rotate(180deg) translateY(" + settings.height + "px)"
   });
   return $(this).css({
     overflow: "hidden"

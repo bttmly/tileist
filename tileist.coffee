@@ -116,8 +116,6 @@ $.fn.tileist = ( options ) ->
 	grid.cells = $( ".tileist-cell" )
 	focus = grid.randomCell()
 	grid.focalCell = grid.cells.eq grid.coordToFlatIndex( focus )
-	grid.focalCell.css
-		background: "blue"
 
 	distances = []
 
@@ -130,8 +128,8 @@ $.fn.tileist = ( options ) ->
 			method = if num < 50 then "lightenByRatio" else "darkenByRatio"
 			$el.css
 				borderTop: "0px solid transparent"
-				borderRight: "#{settings.width}px solid transparent"
-				borderBottom: "#{settings.height}px solid #{color[method]( num / 200 )}"
+				borderRight: "#{ settings.width }px solid transparent"
+				borderBottom: "#{ settings.height }px solid #{ color[method]( num / 200 ) }"
 				borderLeft: "0px solid transparent"
 
 			console.log ( num / 200 )
@@ -144,9 +142,9 @@ $.fn.tileist = ( options ) ->
 
 
 	vein.inject ".tileist-cell-triangle div:nth-of-type(2)",
-		"-webkit-transform" : "rotate(180deg) translateY(80px)"
-		"-moz-transform" : "rotate(180deg) translateY(80px)"
-		"transform" : "rotate(180deg) translateY(80px)"
+		"-webkit-transform" : "rotate(180deg) translateY(#{ settings.height }px)"
+		"-moz-transform" : "rotate(180deg) translateY(#{ settings.height }px)"
+		"transform" : "rotate(180deg) translateY(#{ settings.height }px)"
 
 	$( this ).css
 		overflow: "hidden"
