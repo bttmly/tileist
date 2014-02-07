@@ -10,10 +10,10 @@
             body {
                 font-family: sans-serif;
                 margin: 0;
+                color: white;
             }
 
             h1 {
-                color: white;
                 text-align: center;
             }
 
@@ -23,27 +23,211 @@
                 height: 100vh;
                 top: 0;
                 z-index: -1;
-           }
+            }
+
+            a, a:active, a:hover, a:visited, a:focus {
+                color: white;
+            }
+
+            .main {
+                margin: 2rem auto;
+                padding: 2rem;
+                width: 75%;
+                background: rgba(0, 0, 0, .5);
+                border-radius: 1rem;
+            }
+
+            button {
+                font-family: sans-serif;
+                display: block;
+                color: white;
+                background: transparent;
+                border: 2px solid white;
+                border-radius: 4rem;
+                cursor: pointer;
+                transition: background .15s ease-in-out, color .15s ease-in-out;
+            }
+
+            .tileist-button {
+                font-size: 1.5rem;
+                width: 12em;
+                padding: .5em;
+                margin: 2rem auto;
+            }
+
+            .controls-button {
+                padding: 1em;
+                margin: 1rem auto;
+            }
+
+            button:hover, button.opened {
+                background: white;
+                color: black;
+            }
+
+            button:focus {
+                outline: none;
+            }
+
+            .links {
+                font-family: "Consolas", monospace;
+                list-style-type: none;
+                text-align: center;
+                margin: 2rem 0;
+                padding: 0;
+            }
+
+            .links li {
+                text-align: center;
+                display: inline-block;
+                margin-left: 1rem;
+                margin-right: 1rem;
+            }
+
+            .tileist-controls {
+                display: none;
+                margin: 0 auto;
+                width: 20rem;
+            }
+
+            .tileist-controls .input-label-pair {
+                margin-bottom: .5rem;
+            }
+
+            .tileist-controls input {
+                width: 4rem;
+            }
+
+            .tileist-controls label {
+                width: 8rem;
+                margin-right: 2rem;
+                text-align: right;
+                display: inline-block;
+            }
+
+
 
 
         </style>
     </head>
     <body>
-        <h1>Tileist</h1>
         <div class="tileist-box" id="js-tileist-box"></div>
 
+        <div class="main">
+            <h1>Tileist</h1>
+            <p>Tileist is a jQuery plugin to generate (semi) randomly colored tiles in various shapes. Well, just triangles right now. But rectangles (easy) and hexagons (hard) are coming soon. Inspired by <a href="http://dev.ghost.org/content/images/2013/Nov/user_cover.png">this image</a> on the <a href="http://dev.ghost.org/">Ghost dev blog</a>. The color manipulation functions need some work too.</p>
+
+            <button class="tileist-button" id="js-tileist-button">Regenerate Tiles</button>
+
+            <button class="controls-button" id="js-controls-button">More Options</button>
+
+            <div class="tileist-controls">
+
+                <div class="input-label-pair">
+                    <label>Grid X size</label>
+                    <input id="js-tileist-x" type="number"
+                        min="2"
+                        max="40"
+                        value="16"
+                    />
+                </div>
+
+                <div class="input-label-pair">
+                    <label>Grid Y size</label>
+                    <input id="js-tileist-y" type="number"
+                        min="2"
+                        max="20"
+                        value="6"
+                    />
+                </div>
+
+                <div class="input-label-pair">
+                    <label>Color</label>
+                    <input id="js-tileist-color" type="color" value="#9b59b6"/>
+                </div>
+
+                <div class="input-label-pair">
+                    <label><span class="help-text" title="cells nearer to this one tend to be lighter, cells farther away darker">Focal cell</span> ( x, y )</label>
+                    <input id="js-tileist-focus" type="text" value="2, 2"/>
+                </div>
+
+            </div>
+
+            <ul class="links">
+                <li>
+                    <a href="https://github.com/nickb1080/tileist">Repo on Github</a>
+                </li>
+            </ul>
+
+        </div>
+        
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
         <script src="color.js"></script>
         <script src="tileist.js"></script>
         <script>
             $(function(){
-                $("#js-tileist-box").tileist({
+
+                var tileize = function( optionsObj ) {
+                    $("#js-tileist-box").tileist( optionsObj );
+                }
+
+                var validateUserOptions = function() {
+                    var x = $( "#js-tileist-x" ).val()
+                    var y = $( "#js-tileist-y" ).val()
+                    var color = $( "#js-tileist-color" ).val()
+                    var focus = $( "#js-tileist-focus" ).val()
+
+                    if ( ( !typeof x === "number" ) || ( !typeof y === "number" ) ) {
+                        return false
+                    }
+
+                    focus = focus.split(", ")
+
+                    if ( ( parseInt( focus[0] ) === "NaN" ) 
+                        || ( parseInt( focus[1] ) === "NaN" ) 
+                        || focus.length > 2 ) {
+                        return false
+                    }
+
+                    else return {
+                        color: color,
+                        width: x,
+                        height: y,
+                        focus: focus
+                    }
+
+                }
+
+                var defaultOptions = {
                     color: "#16a085",
                     width: 16,
                     height: 6,
                     focus: [4, 2]
+                }
+
+                var userOptions;
+
+                $( "#js-tileist-button" ).on("click", function(){
+
+                    userOptions = validateUserOptions()
+
+                    console.log(userOptions)
+
+                    tileize( userOptions || defaultOptions )
                 });
+
+                $( "#js-controls-button" ).on("click", function(){
+                    $( ".tileist-controls" ).slideToggle()
+                    $( this ).toggleClass( "opened" )
+                    if ( $( this ).is( ".opened" ) ) {
+                        $( this ).html( "Close Options" )
+                    } else {
+                        $( this ).html( "Show Options" )
+                    }
+                });
+
+                tileize( defaultOptions );
             });
 
         </script>
