@@ -213,7 +213,7 @@ $.fn.tileist = function(options) {
     "border-left": "" + settings.cellWidth + "px solid transparent"
   });
   grid.cells = $(".tileist-cell");
-  focus = grid.randomCell();
+  focus = settings.focus || grid.randomCell();
   grid.focalCell = grid.cells.eq(grid.coordToFlatIndex(focus));
   window.distances = [];
   color = Color(settings.color);

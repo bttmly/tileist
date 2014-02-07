@@ -165,7 +165,7 @@ $.fn.tileist = ( options ) ->
 		"border-left": "#{ settings.cellWidth }px solid transparent"
 
 	grid.cells = $( ".tileist-cell" )
-	focus = grid.randomCell()
+	focus = settings.focus or grid.randomCell()
 	grid.focalCell = grid.cells.eq grid.coordToFlatIndex( focus )
 
 	window.distances = []
