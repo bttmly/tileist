@@ -3,8 +3,8 @@ var __hasProp = {}.hasOwnProperty,
   __extends = function(child, parent) { for (var key in parent) { if (__hasProp.call(parent, key)) child[key] = parent[key]; } function ctor() { this.constructor = child; } ctor.prototype = parent.prototype; child.prototype = new ctor(); child.__super__ = parent.prototype; return child; };
 
 $.fn.tileist = function(options) {
-  var TwoDimensionalArray, cell, color, colorize, column, defaults, dist, distanceOf, distances, focus, gridSize, head, htmlStr, i, randomIntFromInterval, scaleValues, scaledDistances, settings, style, _i, _len, _results;
-  $(this).empty();
+  var TileistCell, TwoDimensionalArray, cell, color, colorize, column, defaults, dist, distanceOf, distances, focus, grid, gridSize, head, htmlStr, i, randomIntFromInterval, scaleValues, scaledDistances, settings, square, style, _i, _len;
+  $(this).find(".tileist-wrapper").remove();
   $("#tileist-styles").filter("style").remove();
   $.fn.cssInject = function(selector, rules) {
     var prop, string, val;
@@ -17,6 +17,8 @@ $.fn.tileist = function(options) {
       }
       string += "}\n";
       return this.append(string);
+    } else {
+      throw "$.fn.cssInject can only be used on <style> elements";
     }
   };
   defaults = {
@@ -81,6 +83,9 @@ $.fn.tileist = function(options) {
       if (typeof index !== "number") {
         throw new TypeError();
       }
+      if (index < (this.length * this[0].length) - 1) {
+        throw "Index exceeds exceeds array size";
+      }
       arr = [];
       arr[0] = Math.floor(index / this[0].length);
       arr[1] = index % this[0].length;
@@ -116,6 +121,20 @@ $.fn.tileist = function(options) {
     return TwoDimensionalArray;
 
   })(Array);
+  TileistCell = (function(_super) {
+    __extends(TileistCell, _super);
+
+    function TileistCell(coordinates, value, parent) {
+      this.coordinates = coordinates;
+      this.x = coordinates[0];
+      this.y = coordinates[1];
+      this.value = value;
+      this.parent = parent;
+    }
+
+    return TileistCell;
+
+  })(Object);
   scaleValues = function(values, scaleMin, scaleMax) {
     var max, min, num, _i, _len, _results;
     if (scaleMin == null) {
@@ -136,11 +155,10 @@ $.fn.tileist = function(options) {
   randomIntFromInterval = function(min, max) {
     return Math.floor(Math.random() * (max - min + 1) + min);
   };
+  square = function(num) {
+    return num * num;
+  };
   distanceOf = function(origin, location) {
-    var square;
-    square = function(num) {
-      return num * num;
-    };
     return Math.sqrt(square(origin[0] - location[0]) + square(origin[1] - location[1]));
   };
   colorize = function($el, dist, odd) {
@@ -152,7 +170,7 @@ $.fn.tileist = function(options) {
     absRatio = Math.abs(ratio);
     return $el.css("border-" + borderSide + "-color", "" + (color[methodA](absRatio)[methodB](absRatio)));
   };
-  window.grid = new TwoDimensionalArray(gridSize.x, gridSize.y, cell[settings.layout]);
+  grid = new TwoDimensionalArray(gridSize.x, gridSize.y, cell[settings.layout]);
   htmlStr = ((function() {
     var _i, _len, _results;
     _results = [];
@@ -200,7 +218,6 @@ $.fn.tileist = function(options) {
   grid.cells = $(".tileist-cell");
   focus = settings.focus || grid.randomCell();
   grid.focalCell = grid.cells.eq(grid.coordToFlatIndex(focus));
-  window.distances = [];
   color = Color(settings.color);
   distances = (function() {
     var results;
@@ -214,17 +231,16 @@ $.fn.tileist = function(options) {
     return results;
   })();
   scaledDistances = scaleValues(distances, -1, 1);
-  _results = [];
   for (i = _i = 0, _len = scaledDistances.length; _i < _len; i = ++_i) {
     dist = scaledDistances[i];
     cell = grid.cells.eq(i);
     if (cell.children().length) {
-      _results.push(cell.children().each(function(j) {
+      cell.children().each(function(j) {
         return colorize($(this), dist, j % 2);
-      }));
+      });
     } else {
-      _results.push(colorize(cell, dist));
+      colorize(cell, dist);
     }
   }
-  return _results;
+  return $.fn.cssInject = void 0;
 };
