@@ -35,6 +35,11 @@
                 width: 75%;
                 background: rgba(0, 0, 0, .5);
                 border-radius: 1rem;
+                transition: opacity .5s ease-in-out;
+            }
+
+            .hide-main .main {
+                opacity: 0;
             }
 
             button {
@@ -105,6 +110,20 @@
                 display: inline-block;
             }
 
+            .minimal-controls {
+                display: none;
+                transition: opacity .5s ease;
+                position: absolute;
+                top: 2rem;
+                left: 2rem;
+                font-family: "Consolas", monospace;
+            }
+
+            .minimal-controls a {
+                display: block;
+                padding: .25rem;
+            }
+
             .help-text {
                 border-bottom: 1px dotted white;
                 cursor: help;
@@ -162,9 +181,18 @@
                 <li>
                     <a href="https://github.com/nickb1080/tileist">Repo on Github</a>
                 </li>
+                <li>
+                    <a id="js-main-show-hide" href="#">Hide this thing</a>
+                <li>
             </ul>
 
         </div>
+
+        <div class="minimal-controls">
+            <a href="#" id="js-show-info">Show Info</a>
+            <a href="#" id="js-regenerate">Regenerate Tiles</a>
+        </div>
+
         
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -184,7 +212,7 @@
                     var focus = $( "#js-tileist-focus" ).val()
 
                     if ( ( !typeof x === "number" ) || ( !typeof y === "number" ) ) {
-                        return false
+                        return false;
                     }
 
                     focus = focus.split(", ")
@@ -192,7 +220,8 @@
                     if ( ( parseInt( focus[0] ) === "NaN" ) 
                         || ( parseInt( focus[1] ) === "NaN" ) 
                         || focus.length > 2 ) {
-                        return false
+                        alert( "Focus should be in the form 'X, Y'");
+                        return false;
                     }
 
                     else return {
@@ -213,11 +242,9 @@
 
                 var userOptions;
 
-                $( "#js-tileist-button" ).on("click", function(){
+                $( "body" ).on("click", "#js-tileist-button, #js-regenerate", function(){
 
                     userOptions = validateUserOptions()
-
-                    console.log(userOptions)
 
                     tileize( userOptions || defaultOptions )
                 });
@@ -230,6 +257,12 @@
                     } else {
                         $( this ).html( "Show Options" )
                     }
+                });
+
+                $( "body" ).on("click", "#js-main-show-hide, #js-show-info", function( event ){
+                    event.preventDefault();
+                    $( ".main" ).toggle();
+                    $( ".minimal-controls" ).toggle();
                 });
 
                 tileize( defaultOptions );

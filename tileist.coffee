@@ -1,5 +1,8 @@
 $.fn.tileist = ( options ) ->
 
+	$( this ).empty()
+	$( "#tileist-styles" ).filter( "style" ).remove()
+
 	$.fn.cssInject = ( selector, rules ) ->
 		if this.is "style"
 			string = ""
@@ -112,7 +115,7 @@ $.fn.tileist = ( options ) ->
 	this.append $("<div class='tileist-wrapper'>#{ htmlStr }</div>")
 
 	head = $("head")
-	style = $("<style id='css-inject'>").appendTo( head )
+	style = $("<style id='tileist-styles'>").appendTo( head )
 
 	style.cssInject "#{ this.selector } *",
 		"box-sizing" : "border-box"
