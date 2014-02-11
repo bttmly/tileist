@@ -1,6 +1,6 @@
 $.fn.tileist = ( options ) ->
 
-	$( this ).find( ".tileist-wrapper" ).remove()
+	$( this ).empty()
 	$( "#tileist-styles" ).filter( "style" ).remove()
 
 	$.fn.cssInject = ( selector, rules ) ->
@@ -11,16 +11,14 @@ $.fn.tileist = ( options ) ->
 				string += "#{ prop } : #{ val };\n"
 			string += "}\n"
 			this.append string
-		else
-			throw "$.fn.cssInject can only be used on <style> elements"
-
+	
 	defaults = 
 		layout: "triangle"
 		width: 16
 		height: 6
 		color: "#27ae60"
 
-	settings = $.extend {}, defaults, options
+	settings = $.extend( {}, defaults, options )
 
 	settings.cellWidth = Math.ceil this.width() / settings.width
 	settings.cellWidthPct = Math.ceil 100 / settings.width
@@ -41,8 +39,6 @@ $.fn.tileist = ( options ) ->
 		    this.push []
 		    for y in [0...ySize]
 		      this[x].push fill
-		      # cell = new TileistCell( [], fill, )
-		      # this[x].push cell
 
 		randomCell : ( flatIndex ) ->
 			arr = []
@@ -64,9 +60,6 @@ $.fn.tileist = ( options ) ->
 
 		flatIndexToCoord : ( index ) ->
 			throw new TypeError() unless typeof index is "number"
-			if index < ( this.length * this[0].length ) - 1
-				throw "Index exceeds exceeds array size"
-
 			arr = []
 			arr[0] = Math.floor( index / this[0].length )
 			arr[1] = index % this[0].length
@@ -82,18 +75,6 @@ $.fn.tileist = ( options ) ->
 				for secondDimArr, y in this[x]
 					func.call( thisArg, this[x][y], x, y, this )
 
-	class TileistCell extends Object
-		constructor : ( coordinates, value, parent ) ->
-			this.coordinates = coordinates
-			this.x = coordinates[0]
-			this.y = coordinates[1]
-			this.value = value
-			this.parent = parent
-
-
-
-
-
 	scaleValues = ( values, scaleMin = 0, scaleMax = 1 ) ->
 
 	  max = Math.max.apply null, values
@@ -106,23 +87,30 @@ $.fn.tileist = ( options ) ->
 	randomIntFromInterval = ( min, max ) ->
     return Math.floor Math.random() * ( max - min + 1 ) + min
 
-  square = ( num ) -> return num * num
-
   # distance between two coordinate points.
 	distanceOf = ( origin, location ) ->
+		square = ( num ) -> return num * num
 		return Math.sqrt square( origin[0] - location[0] ) + square( origin[1] - location[1] )
 
 	colorize = ( $el, dist, odd ) ->
 		ratio = ( dist / 4 ) + randomIntFromInterval( -2, 2 ) / 16
+
 		methodA = if ratio < 0 then "lightenByRatio" else "darkenByRatio"
 		methodB = if ratio > 0 then "desaturateByRatio" else "saturateByRatio"
 		borderSide = if odd then "bottom" else "top"
+
 		absRatio = Math.abs( ratio )
+
+		# don't want to lighen/darken/saturate/desaturate by extreme amounts
+		# randomize the ratio a little
+		
+
 		$el.css "border-#{ borderSide }-color", "#{ color[methodA]( absRatio )[methodB]( absRatio ) }"
 
 
-	grid = new TwoDimensionalArray gridSize.x, gridSize.y, cell[settings.layout]
 
+
+	window.grid = new TwoDimensionalArray gridSize.x, gridSize.y, cell[settings.layout]
 	htmlStr = ( "<div class='tileist-column'>#{ column.join( "\n" ) }</div>" for column in grid ).join( "\n" )
 	this.append $("<div class='tileist-wrapper'>#{ htmlStr }</div>")
 
@@ -165,21 +153,20 @@ $.fn.tileist = ( options ) ->
 	focus = settings.focus or grid.randomCell()
 	grid.focalCell = grid.cells.eq grid.coordToFlatIndex( focus )
 
-	# window.distances = []
+	window.distances = []
 
 	color = Color( settings.color )
 
-	# get distance from focus of each cell
 	distances = do ->
 		results = []
 		grid.forEach2d ( el, x, y, arr ) ->
 			dist = distanceOf( focus, [x, y] )
 			index = grid.coordToFlatIndex( [x, y] )
 			results[index] = dist
+			# grid.cells.eq( index ).attr( "data-focus-distance", "#{ dist }" ) 
 		return results
 
 	scaledDistances = scaleValues( distances, -1, 1 )
-
 	for dist, i in scaledDistances
 		cell = grid.cells.eq( i )
 		if cell.children().length
@@ -188,5 +175,14 @@ $.fn.tileist = ( options ) ->
 		else
 			colorize cell, dist
 
-	# clean up
-	$.fn.cssInject = undefined
+	# grid.cells.each ( i ) ->
+
+	# 	console.log $( this ).attr( "data-focus-distance" )
+
+	# 	colorize = ( $el, odd ) ->
+	# 		num = randomIntFromInterval( -10, 100 )
+	# 		methodA = if num < 0 then "lightenByRatio" else "darkenByRatio"
+	# 		methodB = if num > 0 then "desaturateByRatio" else "saturateByRatio"
+	# 		borderSide = if odd then "bottom" else "top"
+	# 		$el.css "border-#{ borderSide }-color", "#{ color[methodA]( num / 150 )[methodB]( num / 150 ) }"
+
